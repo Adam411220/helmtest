@@ -11,17 +11,23 @@ on:
 
 env:
   CHART_NAME: my-chart
-  IMAGE_TAG: ${{ github.sha }}
+  BASE_VERSION: 1.0.0
 
 jobs:
   job:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
       - name: Install Helm
         run: |
           curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+      - name: Generate Semantic Version
+        id: semver
+        run: |
+          echo "IMAGE_TAG=${{ env.BASE_VERSION }}-${{ github.run_number }}" >> $GITHUB_ENV
 
       - name: Helm Lint
         run: |
@@ -38,4 +44,4 @@ jobs:
       - name: Helm Push to GHCR
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         run: |
-          helm push $CHART_NAME-$IMAGE_TAG.tgz oci://ghcr.io/${{ github.repository_owner }}
+          helm push ${{ env.CHART_NAME }}-$IMAGE_TAG.tgz oci://ghcr.io/${{ github.repository_owner }}
