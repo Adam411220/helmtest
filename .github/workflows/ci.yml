@@ -19,7 +19,7 @@ jobs:
 
       - name: Helm Lint
         run: |
-          helm lint charts/test-chart
+          helm lint test-chart
 
       - name: Login to Docker Hub
         run: |
@@ -27,9 +27,9 @@ jobs:
 
       - name: Helm Package
         run: |
-          helm package charts/test-chart --destination charts/
+          helm package test-chart --destination .
 
       - name: Push Helm Chart to Docker Hub
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         run: |
-          helm push charts/test-chart-*.tgz oci://registry-1.docker.io/${{ secrets.DOCKERHUB_USERNAME }}
+          helm push test-chart-*.tgz oci://registry-1.docker.io/${{ secrets.DOCKERHUB_USERNAME }}
