@@ -1,7 +1,4 @@
 name: ci-helm-ghcr
-permissions:
-  packages: write
-  contents: read
 
 on:
   push:
