@@ -44,4 +44,4 @@ jobs:
       - name: Helm Push to GHCR
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         run: |
-          helm push ${{ env.CHART_NAME }}-$IMAGE_TAG.tgz oci://ghcr.io/${{ github.repository_owner }}
+          helm push my-chart-$IMAGE_TAG.tgz oci://ghcr.io/Adam411220/my-helm-charts
