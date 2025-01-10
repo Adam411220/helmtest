@@ -37,8 +37,14 @@ jobs:
       - name: Helm Package
         run: |
           helm package . --version $IMAGE_TAG
+          echo "PACKAGED_FILE=$(ls my-chart-${{ env.IMAGE_TAG }}.tgz)" >> $GITHUB_ENV
+
+      - name: Debug Package
+        run: |
+          echo "Packaged file: $PACKAGED_FILE"
+          ls -l
 
       - name: Helm Push to GHCR
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         run: |
-          helm push my-chart-$IMAGE_TAG.tgz oci://ghcr.io/Adam411220/my-helm-charts
+          helm push my-chart-${{ env.IMAGE_TAG }}.tgz oci://ghcr.io/Adam411220/my-helm-charts
