@@ -1,0 +1,35 @@
+name: ci-helm-dockerhub
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install Helm
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+      - name: Helm Lint
+        run: |
+          helm lint charts/test-chart
+
+      - name: Login to Docker Hub
+        run: |
+          echo ${{ secrets.DOCKERHUB_TOKEN }} | helm registry login registry-1.docker.io -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
+      - name: Helm Package
+        run: |
+          helm package charts/test-chart --destination charts/
+
+      - name: Push Helm Chart to Docker Hub
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        run: |
+          helm push charts/test-chart-*.tgz oci://registry-1.docker.io/${{ secrets.DOCKERHUB_USERNAME }}
